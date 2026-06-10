@@ -1,2 +1,0 @@
-# Cyberpro
-Cyberpro‘s website
