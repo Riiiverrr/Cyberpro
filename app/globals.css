@@ -1,0 +1,328 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #000000;
+  --ink: #ffffff;
+  --chipink: #e8e8f6;
+  --muted: rgba(255, 255, 255, 0.5);
+  --faint: rgba(255, 255, 255, 0.3);
+  --line: rgba(255, 255, 255, 0.12);
+  --accent-green: #aef17e;
+  --accent-blue: #299dff;
+  --accent-purple: #9da4ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-courier-prime), "Courier New", monospace;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* Hide native cursor only on devices with a precise pointer (custom cursor active) */
+@media (pointer: fine) {
+  body.has-custom-cursor,
+  body.has-custom-cursor * {
+    cursor: none;
+  }
+}
+
+/* ---- Nav link: underline expands from left on hover ---- */
+.nav-link {
+  position: relative;
+  display: inline-block;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: #ffffff;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms ease;
+}
+.nav-link:hover::after,
+.nav-link[data-active="true"]::after {
+  transform: scaleX(1);
+}
+
+/* ---- Contact nav button: liquid-glass stroke (conic stroke + backdrop saturate, top sheen via ::after) ---- */
+.nav-contact-btn {
+  position: relative;
+  isolation: isolate;
+  color: var(--chipink);
+  background: transparent;
+  border: none;
+  border-radius: 22.67px;
+}
+/* glass stroke ring: conic "liquid" highlight, masked to a 2px edge, blurring + saturating the backdrop */
+.nav-contact-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(255, 255, 255, 0.45),
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.45)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35), 0 0 12px rgba(255, 255, 255, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+/* top liquid sheen — soft white streak across the upper edge, screen-blended */
+.nav-contact-btn::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.32),
+    rgba(255, 255, 255, 0.08) 20%,
+    transparent 45%
+  );
+  opacity: 0.9;
+  filter: blur(6px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.nav-contact-btn .nav-contact-label {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, #e8e8f6 0%, rgba(232, 232, 246, 0.72) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.18);
+  transition: text-shadow 240ms ease;
+}
+.nav-contact-btn:hover::before {
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35), 0 0 18px rgba(255, 255, 255, 0.16),
+    0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.nav-contact-btn:hover::after {
+  opacity: 1;
+}
+
+/* ---- Footer link hover ---- */
+.footer-link {
+  /* Figma: footer link text is full white rgba(255,255,255,1). Dim slightly
+     on hover for interaction feedback. */
+  color: #ffffff;
+  transition: color 150ms ease;
+}
+.footer-link:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ---- "Work together ->" CTA arrow ---- */
+.cta-arrow {
+  display: inline-block;
+  transition: transform 200ms ease;
+}
+.cta-link:hover .cta-arrow {
+  transform: translateX(4px);
+}
+
+/* ---- Typewriter caret (Hero cycling word) ---- */
+.cursor-caret {
+  display: inline-block;
+  margin-left: 1px;
+  font-weight: 400;
+  color: currentColor;
+  animation: caret-blink 1s steps(1) infinite;
+}
+@keyframes caret-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* ---- Glass chip / tag pill: transparent fill + thin solid white border
+   (Figma tag button: bg rgba(0,0,0,0), 0.986px solid white, radius 49.282px) ---- */
+.glass-chip {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 49.282px;
+  background: transparent;
+  border: none;
+  color: var(--chipink);
+}
+/* liquid-glass stroke ring — conic highlight masked to a ~1px edge (matches .nav-contact-btn) */
+.glass-chip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(255, 255, 255, 0.45),
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.45)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35), 0 0 12px rgba(255, 255, 255, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+/* top liquid sheen — soft white streak across the upper edge, screen-blended */
+.glass-chip::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.32),
+    rgba(255, 255, 255, 0.08) 20%,
+    transparent 45%
+  );
+  opacity: 0.9;
+  filter: blur(6px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+/* keep icon + label above the glass layers */
+.glass-chip > span,
+.glass-chip__icon {
+  position: relative;
+  z-index: 2;
+}
+.glass-chip__icon {
+  width: 16.75px;
+  height: 16.75px;
+  flex-shrink: 0;
+  /* The sparkle is masked so each chip tints its own icon via --chip-icon
+     (Figma gives every tag a distinct accent fill). */
+  background-color: var(--chip-icon, #aef17e);
+  -webkit-mask: url("/figma/chip-icon.svg") no-repeat center / contain;
+  mask: url("/figma/chip-icon.svg") no-repeat center / contain;
+}
+
+/* ---- Glass play button: translucent disc + conic stroke ring + centered play triangle ---- */
+.glass-play {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  /* filled translucent glass disc (matches Figma: white ~10% fill) */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+}
+.glass-play::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(255, 255, 255, 0.45),
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.45)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35), 0 0 12px rgba(255, 255, 255, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+.glass-play::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.32),
+    rgba(255, 255, 255, 0.08) 20%,
+    transparent 45%
+  );
+  opacity: 0.9;
+  filter: blur(6px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.glass-play > svg {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---- Corner crop marks (the 4 small squares around framed blocks) ---- */
+.crop-frame {
+  position: relative;
+}
+.crop-mark {
+  position: absolute;
+  width: 7.885px;
+  height: 7.885px;
+  border-radius: 1px;
+  background: #ffffff;
+}
+.crop-mark--tl { top: -3.9px; left: -3.9px; }
+.crop-mark--tr { top: -3.9px; right: -3.9px; }
+.crop-mark--bl { bottom: -3.9px; left: -3.9px; }
+.crop-mark--br { bottom: -3.9px; right: -3.9px; }
+
+/* ---- Reduced motion: kill all transitions/animations ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
