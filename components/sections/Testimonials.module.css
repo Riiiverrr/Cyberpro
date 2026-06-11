@@ -1,64 +1,56 @@
-/* Stage holds the gradient curve + the hanging note strips. */
+/* Stage reproduces the Figma "customer voice" frame (node 1:793), 1911×1046.
+   Everything inside is placed in that frame's coordinate space, so the curve's
+   dots and the cards' corners line up exactly as in the design. */
 .stage {
+  container-type: inline-size;
   position: relative;
-  height: 860px;
   width: 100%;
+  aspect-ratio: 1911 / 1046;
 }
 
+/* The gradient curve + colored dots. Asset sits at frame x=33, y=0,
+   w=1845, h=494.044 — placed as % of the frame box. Renders ABOVE the cards
+   (z-index 10) so each dot shows right on the corner of the card hanging from
+   it, just like Figma. */
 .curve {
   position: absolute;
-  inset-inline: 0;
+  left: 1.727%; /* 33 / 1911 */
   top: 0;
-  width: 100%;
-  height: 300px;
+  width: 96.546%; /* 1845 / 1911 */
+  height: 47.232%; /* 494.044 / 1046 */
   pointer-events: none;
+  user-select: none;
+  z-index: 10;
 }
 
-/* A pin = the colored dot sitting on the curve; the note strip hangs from it. */
-.pin {
-  position: absolute;
-  transform: translateX(-50%);
-}
-
-.dot {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: translate(-50%, -50%);
-  width: 16px;
-  height: 16px;
-  border-radius: 999px;
-  box-shadow: 0 0 14px currentColor;
-  background: currentColor;
-  z-index: 3;
-}
-
-/* Glass note strip — liquid-glass stroke (conic ring + top sheen) over a
-   #000000/20% frosted fill. Per the Figma design the strip is landscape and
-   hangs diagonally from its pin (top-left corner), with the quote reading
-   along the strip in Courier Prime. Clicking swings it upright to read
-   horizontally; clicking again re-hangs it. */
+/* Glass note card. Each is a 564×190 (one 658×190) landscape card pinned by its
+   Figma ORIGIN CORNER (local 0,0) — left/top come straight from the design's
+   absolute corner, transform-origin is that corner, and the card is rotated to
+   its Figma angle. Because the card and the curve share the frame's coordinate
+   space, the dot lands exactly on the card's corner with no guesswork.
+   Translucent frosted glass matching the site's .glass-chip tags: transparent
+   fill + backdrop blur + a thin conic liquid-glass edge. Clicking swings it
+   upright (rotate 0) so the quote reads horizontally. */
 .note {
   position: absolute;
-  top: 16px;
-  left: 0;
   isolation: isolate;
-  width: 576px;
-  height: 199px;
-  border-radius: 30px;
-  /* fill: black 20% over a frosted backdrop (Figma Rectangle 161124212) */
-  background: rgba(0, 0, 0, 0.2);
+  height: 9.943cqw; /* 190 Figma units / 19.11 */
+  padding: 1.675cqw; /* 32 units */
+  border-radius: 1.57cqw; /* 30 units */
+  /* near-transparent fill so the glass reads through; frosting comes from the
+     backdrop blur, the same look as .glass-chip / .nav-contact-btn */
+  background: rgba(255, 255, 255, 0.05);
   border: none;
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  transform-origin: top left;
-  transform: rotate(var(--tilt, 0deg));
-  transition: transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1),
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  transform-origin: 0 0;
+  transform: rotate(var(--rot, 0deg));
+  transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1),
     box-shadow 0.3s ease;
   cursor: pointer;
   text-align: left;
 }
-/* thin liquid-glass edge ring (kept subtle so the fill stays translucent) */
+/* thin liquid-glass edge ring (conic highlight masked to a ~1px edge) */
 .note::before {
   content: "";
   position: absolute;
@@ -67,18 +59,18 @@
   padding: 1px;
   background: conic-gradient(
     from 180deg at 50% 50%,
+    rgba(255, 255, 255, 0.45),
+    rgba(255, 255, 255, 0.08),
     rgba(255, 255, 255, 0.35),
     rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.28),
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.35)
+    rgba(255, 255, 255, 0.45)
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4),
-    0 8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    0 8px 24px rgba(0, 0, 0, 0.3);
   pointer-events: none;
   z-index: 1;
 }
@@ -103,23 +95,25 @@
 .note.open {
   transform: rotate(0deg);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-  z-index: 20;
+  z-index: 30;
 }
 
-.quoteWrap {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  padding: 26px 34px;
-}
 .quote {
+  position: relative;
+  z-index: 2;
   margin: 0;
   color: #fff;
   font-family: var(--font-courier-prime), "Courier New", monospace;
-  font-size: 20px;
-  line-height: 1.55;
+  font-size: 1.047cqw; /* 20 Figma units */
+  line-height: 1.567; /* 31.333px / 20 from the Figma text node */
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.note.open .quote {
+  -webkit-line-clamp: unset;
 }
 
 @media (prefers-reduced-motion: reduce) {

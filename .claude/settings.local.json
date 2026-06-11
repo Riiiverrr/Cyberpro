@@ -108,7 +108,14 @@
       "Bash(pip3 install *)",
       "Bash(curl -s -o /tmp/bokk_design.png \"https://www.figma.com/api/mcp/asset/2fc4fd7f-4827-4408-be24-ea7e6fa0311f\")",
       "Bash(curl -s -o /tmp/design_285.png \"https://www.figma.com/api/mcp/asset/6456f87e-c139-413f-898f-20ad1f4e45fe\")",
-      "Bash(curl -s -o /tmp/figma_cv.png \"https://www.figma.com/api/mcp/asset/e978cb98-1ca2-439e-8cb7-63d28a1f27e1\")"
+      "Bash(curl -s -o /tmp/figma_cv.png \"https://www.figma.com/api/mcp/asset/e978cb98-1ca2-439e-8cb7-63d28a1f27e1\")",
+      "Bash(curl -s -o public/customer-voice-line.png \"https://www.figma.com/api/mcp/asset/9fb10ef3-f32b-49f1-80e6-c567bca7b536\")",
+      "Bash(python3 -c \"from PIL import Image; im=Image.open\\('public/customer-voice-line.png'\\); print\\('line asset size', im.size\\)\")",
+      "Bash(curl -s -o /tmp/figma_clean.png \"https://www.figma.com/api/mcp/asset/e322806b-b8c3-4cb2-bcae-b4812fe95d3e\")",
+      "Bash(curl -s -o /tmp/figma_voice.png \"https://www.figma.com/api/mcp/asset/b2fde98e-bb0c-41d1-bb63-adcd2d5da456\")",
+      "Bash(curl -s -o /tmp/cv-design.png \"https://www.figma.com/api/mcp/asset/cb68544e-3fa8-4f3f-a95f-00f5a52c23be\")",
+      "Bash(node *)",
+      "Bash(curl -s -o /tmp/cv-design.png \"https://www.figma.com/api/mcp/asset/a940795b-412e-4e0b-af7a-a8c8961d9c78\")"
     ]
   }
 }
