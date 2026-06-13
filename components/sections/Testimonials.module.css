@@ -31,27 +31,66 @@
    Translucent frosted glass matching the site's .glass-chip tags: transparent
    fill + backdrop blur + a thin conic liquid-glass edge. Clicking swings it
    upright (rotate 0) so the quote reads horizontally. */
+/* Positioner: pins the card's Figma origin corner to its dot (left/top +
+   transform-origin 0 0) and holds the resting angle. It carries no visuals, so
+   when the inner card wobbles, this corner — and the dot on it — never moves. */
 .note {
   position: absolute;
-  isolation: isolate;
-  height: 9.943cqw; /* 190 Figma units / 19.11 */
-  padding: 1.675cqw; /* 32 units */
-  border-radius: 1.57cqw; /* 30 units */
-  /* near-transparent fill so the glass reads through; frosting comes from the
-     backdrop blur, the same look as .glass-chip / .nav-contact-btn */
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border: none;
-  backdrop-filter: blur(20px) saturate(170%);
-  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  padding: 0;
   transform-origin: 0 0;
   transform: rotate(var(--rot, 0deg));
-  transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1),
-    box-shadow 0.3s ease;
+  /* silky, no-overshoot easeOut so the swing-to-center and return glide */
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-align: left;
 }
+
+/* The visible frosted glass card. Its transform-origin is the DOT it hangs from
+   (--dotx/--doty, set per card), so the hover wobble swings the card like a real
+   tag pinned at that point — the corner diagonally opposite the dot (bottom-left)
+   travels the most. Near-transparent fill; frosting comes from the backdrop blur,
+   the same look as .glass-chip / .nav-contact-btn. */
+/* Open-rotation layer. NOTHING animates its transform — only the click toggles
+   it — so the swing to horizontal (and back) is a pure, uninterrupted transition
+   and stays perfectly silky. It pivots at the dot (inherited --dotx/--doty) so
+   the dot never leaves the curve. */
+.swing {
+  display: block;
+  transform-origin: var(--dotx, 95%) var(--doty, 12%);
+  /* gentle symmetric ease-in-out: eases out of rest AND into the upright stop,
+     so neither end of the swing has an abrupt start or hard landing */
+  transition: transform 1.25s cubic-bezier(0.33, 0, 0.12, 1);
+  will-change: transform;
+}
+.note.open .swing {
+  transform: rotate(calc(-1 * var(--rot, 0deg)));
+}
+
+.card {
+  /* 文字在卡片内垂直居中 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 9.943cqw; /* 190 Figma units / 19.11 */
+  padding: 1.675cqw; /* 32 units，上下左右一致 */
+  border-radius: 1.57cqw; /* 30 units */
+  /* 更通透：降低白色蒙层 + 减弱模糊，让背景更清晰透出 */
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  /* the wind-chime sway lives here and pivots at the same dot; kept on its own
+     layer so it never collides with the open rotation above */
+  transform-origin: var(--dotx, 95%) var(--doty, 12%);
+  transition: box-shadow 0.6s ease;
+  will-change: transform;
+}
 /* thin liquid-glass edge ring (conic highlight masked to a ~1px edge) */
-.note::before {
+.card::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -75,27 +114,101 @@
   z-index: 1;
 }
 /* top liquid sheen */
-.note::after {
+.card::after {
   content: "";
   position: absolute;
   inset: 1px;
   border-radius: inherit;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.18),
-    rgba(255, 255, 255, 0.04) 22%,
+    rgba(255, 255, 255, 0.14),
+    rgba(255, 255, 255, 0.03) 22%,
     transparent 45%
   );
-  opacity: 0.8;
+  opacity: 0.6;
   filter: blur(6px);
   mix-blend-mode: screen;
   pointer-events: none;
   z-index: 1;
 }
+/* The colored dot that the card hangs from. It's positioned in the card's own
+   coordinate space (left/top set inline per card), so it sits exactly where the
+   curve meets the card and — being a child of the wobbling card — stays nailed
+   to the tag while the lower half sways and travels with it when it opens. */
+.dot {
+  position: absolute;
+  width: 0.733cqw; /* dot d = 14 Figma units / 19.11 */
+  height: 0.733cqw;
+  border-radius: 50%;
+  background: var(--dot, #fff);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0.45cqw var(--dot, #fff), 0 0 0.18cqw rgba(255, 255, 255, 0.7);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* At rest, hovering a card makes it sway like a wind chime in a breeze. The
+   wobble lives on the inner .card and pivots at the DOT it hangs from
+   (transform-origin --dotx/--doty), so the whole card swings as a pendulum and
+   the corner opposite the dot (bottom-left) travels the most — both bottom
+   corners clearly move. The dot rides on the card, staying nailed on through the
+   swing. A larger, gently decaying amplitude keeps it lively yet smooth. */
+@keyframes chime {
+  0% {
+    transform: rotate(0deg);
+  }
+  18% {
+    transform: rotate(4.5deg);
+  }
+  42% {
+    transform: rotate(-3deg);
+  }
+  64% {
+    transform: rotate(1.8deg);
+  }
+  84% {
+    transform: rotate(-0.7deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+/* The sway runs on its own — every hanging card chimes continuously, no hover
+   needed. Each card gets a slightly different duration + delay so the row
+   doesn't swing in mechanical lockstep but drifts like real tags in a breeze.
+   No z-index bump: cards stay below the curve (z 10) so the colored dots keep
+   showing on top of the card's corner while it sways. */
+.note:not(.open) .card {
+  animation: chime 2.6s ease-in-out infinite;
+}
+.note:not(.open):nth-of-type(2) .card {
+  animation-duration: 3.1s;
+  animation-delay: -0.4s;
+}
+.note:not(.open):nth-of-type(3) .card {
+  animation-duration: 2.8s;
+  animation-delay: -1.2s;
+}
+.note:not(.open):nth-of-type(4) .card {
+  animation-duration: 3.4s;
+  animation-delay: -0.8s;
+}
+.note:not(.open):nth-of-type(5) .card {
+  animation-duration: 2.5s;
+  animation-delay: -1.6s;
+}
+
+/* Clicked: the card swings upright IN PLACE. The positioner keeps its resting
+   rotation (--rot, pivoting at the origin corner so the dot stays on the curve);
+   the .swing layer counter-rotates by -(--rot) about that same dot, so the net
+   angle is 0 (horizontal, readable) while the dot never leaves the line. A high
+   z-index lifts the open card above the others so the horizontal quote is never
+   covered by a neighboring tag. */
 .note.open {
-  transform: rotate(0deg);
+  z-index: 60;
+}
+.note.open .card {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-  z-index: 30;
 }
 
 .quote {
@@ -116,8 +229,42 @@
   -webkit-line-clamp: unset;
 }
 
+/* Dimmed, blurred backdrop shown while a card is centered. Covers the viewport
+   so a click on any blank area re-hangs the card. Sits below the open card
+   (z 60) but above everything else (curve is z 10, hovered cards z 20). */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: backdropIn 0.3s ease both;
+  cursor: pointer;
+}
+@keyframes backdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .note {
     transition: none;
+  }
+  .note:not(.open) .card {
+    animation: none;
+  }
+  .swing {
+    transition: none;
+  }
+  .card {
+    transition: box-shadow 0.5s ease;
+  }
+  .backdrop {
+    animation: none;
   }
 }
