@@ -10,3 +10,5 @@ next-env.d.ts
 /public/videos/*.mp4
 *.tsbuildinfo
 .claude/settings.local.json
+*.tsbuildinfo
+.claude/settings.local.json
